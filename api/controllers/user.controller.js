@@ -1,34 +1,42 @@
 import User from '../models/user';
 import Response from '../utils/response';
-import cuid from 'cuid';
+import * as Bcrypt from 'bcrypt';
 import Errors from '../utils/errors';
 import Jwt from '../utils/jwt';
+import * as Randomstring from "randomstring";
 
 let UserController = {};
 
 UserController.createUser = async (req, res) => {
     try {
-        if (!req.body.username) {
-            const msg = "Name  is required";
-            return Response.sendValidationError(res, msg);
+        if (!req.body.username || !req.body.password) {
+            const msg = "Username and password  is required";
+            return Response.sendError(res, msg);
         }
-        const user = new User({
-            username: req.body.username,
-            cuid: cuid()
-        });
-        user.save().then((doc) => {
-            if (doc) {
-                const payload = {
-                    id: doc._id,
-                    username: doc.username,
-                    cuid: doc.cuid
-                };
-                const token = Jwt.getToken(payload);
-                return Response.sendSuccess(res, {cuid: doc.cuid, token: token});
-            } else {
-                return Response.sendError(res, Errors.USER_SAVE_ERROR )
-            }
-        })
+        const checkUsername = await User.findOne({username: req.body.username}).exec();
+        if (checkUsername) {
+            const msg = "Username already taken";
+            return Response.sendError(res, msg);
+        } else {
+            const user = new User({
+                username: req.body.username,
+                faculty: req.body.faculty,
+                password: Bcrypt.hashSync(req.body.password, 10)
+            });
+            user.save().then((doc) => {
+                if (doc) {
+                    const payload = {
+                        id: doc._id,
+                        username: doc.username,
+                    };
+                    const token = Jwt.getToken(payload);
+                    const profile = {id: doc._id, username: doc.username, faculty: doc.faculty};
+                    return Response.sendSuccess(res, {profile: profile, token: token});
+                } else {
+                    return Response.sendError(res, Errors.USER_SAVE_ERROR )
+                }
+            })
+        }
     } catch (e) {
         return Response.sendError(res, e)
     }

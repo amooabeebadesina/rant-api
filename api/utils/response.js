@@ -6,14 +6,9 @@ Response.sendSuccess = (res, data) => {
     res.json({'status': 'success', 'data': data})
 };
 
-Response.sendError = (res, msg) => {
-    res.status(500);
-    res.json({'status': 'error', 'data': {'msg': msg }})
-};
-
-Response.sendValidationError = (res, msg) => {
-    res.status(400);
-    res.json({'status': 'error', 'data': {'msg': msg }})
+Response.sendError = (res, msg, data=null) => {
+    res.status(200);
+    res.json({'status': 'error', 'msg': msg, data: data})
 };
 
 export default Response;
