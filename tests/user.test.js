@@ -9,7 +9,7 @@ describe('User endpoints', () => {
         it ('should create a new user', (done) => {
             let user = {
                 username: 'abeeb',
-                password: 'doyinabeeb'
+                password: 'abeeb'
             };
             api.post('/users/create')
                 .expect(200)
