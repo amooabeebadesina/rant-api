@@ -1,5 +1,5 @@
 # rant-api
-The API for a simple rant app (PWA). This API was writing with Node.js and the Express framework.
+The API for a simple rant app (PWA). This API is written in Node.js and the Express framework.
 
 # Get started
 - Clone the project
